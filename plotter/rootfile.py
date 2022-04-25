@@ -3,6 +3,10 @@ import uuid as _uuid
 
 import ROOT
 
+
+class Object:
+    pass
+
 class RootFile:
 
     def __init__(self, path):
@@ -86,16 +90,21 @@ class RootFile:
 
             obj = htmp.Clone()
 
+        # inside dir
         elif '/' in path:
             dirname, name = path.split('/')
-            obj = None
+            obj = self._file.Get(path)
 
         else:
             # histogram/graph
             obj = self._file.Get(path)
 
-        ROOT.SetOwnership(obj, False)
+        if obj is None:
+            pass
+
+
         try:
+            ROOT.SetOwnership(obj, False)
             obj.SetDirectory(0)
         except:
             pass

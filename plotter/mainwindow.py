@@ -86,8 +86,8 @@ class MainWindow(QMainWindow):
         for column in range(self.file_model.columnCount()):
             self.file_view.resizeColumnToContents(column)
 
-        # selection_model = self.file_view.selectionModel()
-        # selection_model.selectionChanged.connect(self.on_select)
+        selection_model = self.file_view.selectionModel()
+        selection_model.selectionChanged.connect(self.on_select)
 
         self.file_view.doubleClicked.connect(self.on_double_click)
         self.file_view.clicked.connect(self.on_click)
@@ -127,6 +127,8 @@ class MainWindow(QMainWindow):
 
         self.button_draw.clicked.connect(self.on_button_draw)
         self.button_clear.clicked.connect(self.on_button_clear)
+
+        # self.button_draw.setShortcut(QKeySequence('Ctrl+D'))
 
 
         # menubar = self.menuBar()
@@ -169,60 +171,33 @@ class MainWindow(QMainWindow):
             ROOT.SetOwnership(obj, False)
             plot.add(obj, color, opts)
 
-        # create
-        plot.create(
-            logx=self.check_logx.isChecked(),
-            logy=self.check_logy.isChecked()
-        )
+
+        plot.set_logx(self.check_logx.isChecked())
+        plot.set_logy(self.check_logy.isChecked())
+
+
+        plot.create()
 
         self.plots.append(plot)
         plot.canvas.Update()
-        self.history.add([ (ifile, item, path, color, opts, sel) for (ifile, item, path, color, opts, sel) in self.plot_model.getItems() ])
 
+        self.history.add([ item for item in self.plot_model.getItems() ])
         self.clear_plot()
+
+        print(self.history._history)
 
     def clear_plot(self):
         self.plot_model.clear()
         #self.update_plot_label()
 
 
-    # @Slot()
-    # def on_select(self):
 
-    #     selection_model = self.file_view.selectionModel()
+    def add_to_plot(self, index=None):
 
-    #     index = selection_model.currentIndex()
-    #     parent = index.parent()
+        # if not index check current selected index from model
+        if index is None:
+            index = self.file_view.selectedIndexes()[0]
 
-    #     has_selection = not selection_model.selection().isEmpty()
-
-    #     current_index = selection_model.currentIndex()
-    #     has_current = current_index.isValid()
-
-    #     if has_current:
-
-    #         # self.view.close_persistent_editor(current_index)
-    #         msg = f"Position: ({current_index.row()},{current_index.column()})"
-    #         if not current_index.parent().isValid():
-    #             msg += " in top level"
-    #         self.statusBar().showMessage(msg)
-
-    #         name, dtype, path = selection_model.model().getItem(current_index).item_data
-
-    #         # check if item is ploteable
-    #         if dtype in ('hist', 'graph', 'branch'):
-
-    #             item = self.plot_model.rowCount()
-
-    #             color = default_colours[item]
-    #             opts = '' if item == 0 else 'same',
-
-    #             self.plot_model.addItem((0, item, path, color, opts, ''))
-
-    #     return
-
-
-    def add_to_plot(self, index):
         name, dtype, path = self.file_model.getItem(index).item_data
 
         if dtype in ('hist', 'graph', 'branch'):
@@ -231,25 +206,68 @@ class MainWindow(QMainWindow):
             opts = '' if idx == 0 else 'same',
             self.plot_model.addItem((0, idx, path, color, opts, ''))
 
+
+    def keyPressEvent(self, event):
+
+        key = event.key()
+
+        if event.modifiers() & Qt.ControlModifier:
+
+            if key == Qt.Key_Q:
+                self.close()
+
+            elif key == Qt.Key_C:
+                self.clear_plot()
+
+            elif key == Qt.Key_D:
+                self.draw()
+
+            elif key == Qt.Key_X:
+                self.check_logx.toggle()
+
+            elif key == Qt.Key_Y:
+                self.check_logy.toggle()
+
+            elif key == Qt.Key_Right:
+                self.add_to_plot()
+
+
+    def show_info(self, index):
+
+        if index is None:
+            index = self.file_view.selectedIndexes()[0]
+
+        name, dtype, path = self.file_model.getItem(index).item_data
+
+        msg = f"({index.row()},{index.column()}) --> {name}, {dtype}, {path}"
+        self.statusBar().showMessage(msg)
+
+
+    @Slot()
+    def on_select(self):
+
+        selection_model = self.file_view.selectionModel()
+
+        index = selection_model.currentIndex()
+
+        self.show_info(index)
+
+
+
     @Slot()
     def on_click(self, index):
-        print('click')
+        if not index.isValid():
+            return
+
+        # nothing for the moment
+
+    @Slot()
+    def on_double_click(self, index):
 
         if not index.isValid():
             return
 
-        msg = f"Position: ({index.row()},{index.column()})"
-        if not index.parent().isValid():
-            msg += " in top level"
-        self.statusBar().showMessage(msg)
-
         self.add_to_plot(index)
-
-
-    @Slot()
-    def on_double_click(self, index):
-        print('doubleclick')
-        self.draw()
 
     @Slot()
     def on_button_draw(self):

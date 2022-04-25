@@ -50,6 +50,12 @@ class Plot:
         self.canvas.Print(self.name + '.'+ extension)
 
 
+    def set_logx(self, val):
+        self.logx = val
+
+    def set_logy(self, val):
+        self.logy = val
+
     def add(self, obj, colour, opts=[], label=''):
 
         # if ',' in opts:
@@ -123,7 +129,7 @@ class Plot:
         return xmin, xmax, ymin, ymax
 
 
-    def create(self, logx=False, logy=False, do_ratio=False):
+    def create(self, do_ratio=False):
 
         # try to guess variable
         names = [ obj.GetName() for obj in self.objects ]
@@ -160,7 +166,7 @@ class Plot:
         if xmin is None or xmax: ## is None or ymin is None or ymax is None:
             xmin, xmax, ymin, ymax = self.compute_ranges()
 
-        if logy:
+        if self.logy:
             ymin = 0.01
 
         self.canvas = ROOT.TCanvas(self.name, self.name, 800, 600)
@@ -190,7 +196,7 @@ class Plot:
             cup.Draw()
             cdown.Draw()
 
-            if logy:
+            if self.logy:
                 cup.SetLogy()
 
         else:
@@ -199,7 +205,7 @@ class Plot:
             self.canvas.SetRightMargin(0.05)
             self.canvas.SetTopMargin(0.05)
 
-            if logy:
+            if self.logy:
                 self.canvas.SetLogy()
 
 

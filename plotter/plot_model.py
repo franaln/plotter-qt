@@ -119,10 +119,12 @@ class PlotTable(QWidget):
         self.view.setModel(model)
 
         self.view.setAlternatingRowColors(True)
-        # self.plot_view.setSelectionBehavior(QAbstractItemView.SelectItems)
-        #self.plot_view.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
-        # self.plot_view.setAnimated(False)
-        # self.plot_view.setAllColumnsShowFocus(True)
+        # self.view.setSelectionBehavior(QAbstractItemView.SelectItems)
+        # self.view.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+        # self.view.setAnimated(False)
+        # self.view.setAllColumnsShowFocus(True)
+        self.view.setShowGrid(False)
+        self.view.resizeColumnsToContents()
 
         self.view.hideColumn(0)
         self.view.hideColumn(1)
@@ -138,8 +140,8 @@ class PlotTable(QWidget):
         size = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
 
         ## Left layout
-        size.setHorizontalStretch(1)
-        self.view.setSizePolicy(size)
+        # size.setHorizontalStretch(2)
+        # self.view.setSizePolicy(size)
         self.main_layout.addWidget(self.view)
 
         # Set the layout to the QWidget
