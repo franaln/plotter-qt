@@ -86,8 +86,8 @@ class TreeItem:
         self.item_data[column] = value
         return True
 
-    def setData(self, dtype, path, name):
-        self.item_data = [name, dtype, path]
+    def setData(self, ifile, dtype, path, name):
+        self.item_data = [name, ifile, dtype, path]
 
     def __repr__(self) -> str:
         result = f"<treeitem.TreeItem at 0x{id(self):x}"
@@ -106,7 +106,7 @@ class TreeModel(QAbstractItemModel):
         super().__init__(parent)
 
         #self.root_data = headers
-        self.root_item = TreeItem(['name', 'dtype', 'path'])
+        self.root_item = TreeItem(['name', 'ifile', 'dtype', 'path'])
         self.setupModelData(file_names, root_files, self.root_item)
 
     def columnCount(self, parent: QModelIndex = None) -> int:
@@ -254,22 +254,21 @@ class TreeModel(QAbstractItemModel):
 
     def setupModelData(self, file_names, root_files, parent):
 
-        for name, root_file in zip(file_names, root_files):
+        for file_idx, (name, root_file) in enumerate(zip(file_names, root_files)):
 
             parent.insertChildren(parent.childCount(), 1, 2)
             file_item = parent.lastChild()
-            file_item.setData('file', name, name)
+            file_item.setData(file_idx, 'file', name, name)
 
-            for i, (depth, dtype, path, name) in enumerate(root_file):
+            for depth, dtype, path, name in root_file:
 
-                print(depth, dtype, path, name)
                 if depth == 0:
                     file_item.insertChildren(file_item.childCount(), 1, 2)
-                    file_item.lastChild().setData(dtype, path, name)
+                    file_item.lastChild().setData(file_idx, dtype, path, name)
                 else:
                     last = file_item.lastChild()
                     last.insertChildren(last.childCount(), 1, 2)
-                    last.lastChild().setData(dtype, path, name)
+                    last.lastChild().setData(file_idx, dtype, path, name)
 
 
     def _repr_recursion(self, item: TreeItem, indent: int = 0) -> str:

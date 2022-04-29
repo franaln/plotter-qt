@@ -69,6 +69,8 @@ class RootFile:
 
     def get_object(self, path, selection=''):
 
+        print('get_object', path, selection)
+
         if ':' in path:
             _, path = path.split(':')
 
@@ -102,11 +104,10 @@ class RootFile:
         if obj is None:
             pass
 
-
-        try:
-            ROOT.SetOwnership(obj, False)
-            obj.SetDirectory(0)
-        except:
-            pass
+        # try:
+        #     ROOT.SetOwnership(obj, False)
+        #     #obj.SetDirectory(0)
+        # except:
+        #     pass
 
         return obj

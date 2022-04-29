@@ -85,8 +85,6 @@ class PlotModel(QAbstractTableModel):
         self._data.clear()
         self.endRemoveRows()
 
-
-
 #     def removeItem(self, position: int, rows: int,
 #                    parent: QModelIndex = QModelIndex()) -> bool:
 #         parent_item = self.getItem(parent)

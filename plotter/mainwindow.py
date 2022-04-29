@@ -96,6 +96,7 @@ class MainWindow(QMainWindow):
         self.file_view.expandToDepth(0)
         self.file_view.hideColumn(1)
         self.file_view.hideColumn(2)
+        self.file_view.hideColumn(3)
 
         self.l_left.addWidget(self.file_view)
 
@@ -166,6 +167,7 @@ class MainWindow(QMainWindow):
         first_hist_norm = None
         for (ifile, item, path, color, opts, sel) in self.plot_model.getItems():
 
+            print(ifile, item, path, color, opts, sel)
             obj = self.files[ifile].get_object(path, sel).Clone()
             obj.SetDirectory(0)
             ROOT.SetOwnership(obj, False)
@@ -198,13 +200,13 @@ class MainWindow(QMainWindow):
         if index is None:
             index = self.file_view.selectedIndexes()[0]
 
-        name, dtype, path = self.file_model.getItem(index).item_data
+        name, ifile, dtype, path = self.file_model.getItem(index).item_data
 
         if dtype in ('hist', 'graph', 'branch'):
             idx = self.plot_model.rowCount()
             color = default_colours[idx]
             opts = '' if idx == 0 else 'same',
-            self.plot_model.addItem((0, idx, path, color, opts, ''))
+            self.plot_model.addItem((ifile, idx, path, color, opts, ''))
 
 
     def keyPressEvent(self, event):
@@ -237,9 +239,9 @@ class MainWindow(QMainWindow):
         if index is None:
             index = self.file_view.selectedIndexes()[0]
 
-        name, dtype, path = self.file_model.getItem(index).item_data
+        ifile, name, dtype, path = self.file_model.getItem(index).item_data
 
-        msg = f"({index.row()},{index.column()}) --> {name}, {dtype}, {path}"
+        msg = f"({index.row()},{index.column()}) --> {ifile}, {name}, {dtype}, {path}"
         self.statusBar().showMessage(msg)
 
 
